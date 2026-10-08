@@ -1,20 +1,21 @@
 # OnThisDay Reel Renderer
 
 Renders 1080x1920 Instagram Reels for the **On This Day** history channel via GitHub Actions.
-Takes a render payload (background image/video URL + headline + caption cards) and produces
-an MP4 with branded overlays, published to GitHub Pages.
+SSH-only: no API tokens needed.
 
 ## How it works
 
-1. **Dispatch**: POST to `https://api.github.com/repos/shubhamm45/onthisday-reel-renderer/actions/workflows/render-reel.yml/dispatches`
-   with `request_id` (unique) and `render_json` (the render payload).
-2. **Render**: The Action downloads the input, runs ffmpeg with the OnThisDay brand treatment
-   (brand lockup, event date badge, headline, timed caption cards, source credit).
+1. **Request**: Push a JSON file to `render-requests/<request_id>.json` (via git/SSH).
+2. **Render**: The Action triggers on the push, downloads the input image/video,
+   runs ffmpeg with the OnThisDay brand treatment (brand lockup, event date badge,
+   headline, timed caption cards, source credit).
 3. **Publish**: MP4 + cover JPG go to `https://shubhamm45.github.io/onthisday-reel-renderer/reels/<request_id>/`,
    manifest at `.../requests/<request_id>.json` with `status: "ready"`.
+4. **Poll**: The caller polls the manifest until `status` is `"ready"`, then uses `video_url`.
 
-## Render payload schema
+## Render request schema
 
+`render-requests/<request_id>.json`:
 ```json
 {
   "reelVideoUrl": "https://.../image.png",
@@ -31,6 +32,8 @@ an MP4 with branded overlays, published to GitHub Pages.
   "backgroundMusicUrl": "https://... (optional)"
 }
 ```
+
+`request_id` must be 8-80 chars: letters, digits, hyphens, underscores.
 
 ## Local test
 

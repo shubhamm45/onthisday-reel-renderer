@@ -1,16 +1,10 @@
 name: Render OnThisDay Reel
-run-name: Render ${{ inputs.request_id }}
+run-name: Render ${{ github.event.head_commit.message }}
 on:
-  workflow_dispatch:
-    inputs:
-      request_id:
-        description: Unique ID, 8-80 letters/digits/hyphens/underscores; never reuse
-        required: true
-        type: string
-      render_json:
-        description: JSON render payload (reelVideoUrl, headline, captionCards, etc.)
-        required: true
-        type: string
+  push:
+    branches: [main]
+    paths:
+      - 'render-requests/*.json'
 permissions:
   contents: write
   pages: write
@@ -27,6 +21,8 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
       - uses: actions/setup-node@v6
         with:
           node-version: '22'
@@ -34,10 +30,22 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y ffmpeg fonts-dejavu-core
-          fc-list | grep -i dejavu | head -3
       - name: Configure Pages
         id: pages
         uses: actions/configure-pages@v5
+      - name: Find render request
+        id: request
+        run: |
+          # Find the JSON file added/changed in this push
+          FILE=$(git diff --name-only HEAD~1 HEAD -- 'render-requests/*.json' | head -1)
+          if [ -z "$FILE" ]; then
+            echo "No render request found in this push" >&2
+            exit 1
+          fi
+          echo "file=$FILE" >> "$GITHUB_OUTPUT"
+          REQUEST_ID=$(basename "$FILE" .json)
+          echo "request_id=$REQUEST_ID" >> "$GITHUB_OUTPUT"
+          echo "Found request: $REQUEST_ID"
       - name: Restore existing videos
         run: |
           mkdir -p public
@@ -47,10 +55,10 @@ jobs:
           fi
       - name: Render and validate
         env:
-          REQUEST_ID: ${{ inputs.request_id }}
-          RENDER_JSON: ${{ inputs.render_json }}
+          REQUEST_ID: ${{ steps.request.outputs.request_id }}
+          PAYLOAD_FILE: ${{ steps.request.outputs.file }}
           BASE_URL: ${{ steps.pages.outputs.base_url }}
-        run: node render.mjs
+        run: node render.mjs --payload "$PAYLOAD_FILE"
       - name: Save public files for future runs
         run: |
           git config user.name 'github-actions[bot]'
