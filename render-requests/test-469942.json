@@ -1,0 +1,17 @@
+{
+  "reelVideoUrl": "https://picsum.photos/1080/1920",
+  "inputKind": "image",
+  "targetDurationSec": 15,
+  "headline": "On this day: the renderer runs on Actions",
+  "captionCards": [
+    "First test card for the renderer.",
+    "Second test card for timing."
+  ],
+  "instagramCaption": "Test caption",
+  "sourceTitle": "Test",
+  "sourceUrl": "https://example.com/test",
+  "sourcePublisher": "Example",
+  "eventDate": "OCTOBER 8",
+  "brandName": "ON THIS DAY",
+  "backgroundMusicUrl": ""
+}
