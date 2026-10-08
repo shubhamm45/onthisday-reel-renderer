@@ -1,0 +1,14 @@
+{
+  "reelVideoUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Space_Shuttle_Atlantis_launch.jpg/800px-Space_Shuttle_Atlantis_launch.jpg",
+  "inputKind": "image",
+  "targetDurationSec": 15,
+  "headline": "On October 3, 1985: Atlantis launched",
+  "captionCards": ["First test card for the renderer.", "Second test card for timing."],
+  "instagramCaption": "Test caption",
+  "sourceTitle": "Test",
+  "sourceUrl": "https://en.wikipedia.org/wiki/Test",
+  "sourcePublisher": "Wikipedia",
+  "eventDate": "OCTOBER 3",
+  "brandName": "ON THIS DAY",
+  "backgroundMusicUrl": ""
+}
